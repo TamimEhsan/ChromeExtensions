@@ -8,8 +8,8 @@ Here are some
 
 - [The Quick Launchers Tutorial](https://youtu.be/wHZCYi1K664)
 
-And I later created one myself to Hide facebook shared posts. 
-
-
-
-If you love my work you can follow me or star this repo. Thank you
+### Extensions List
+- [Application Tracker](./ApplicationTracker/): A simple extension to track job applications. 
+- [Bear](./Bear/): A simple note taking extension.
+- [Quick Launchers](./QuickLaunchers/): A simple extension to launch websites quickly
+- [Facebook Post Manager](./FacebookPostManager/): A simple extension to hide shared posts on Facebook of specified users.
