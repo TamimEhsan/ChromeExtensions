@@ -1,37 +1,93 @@
 document.addEventListener("DOMContentLoaded", async () => {
   let [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
   const url = new URL(tab.url).href;
+  let pageTitle = tab?.title || "No Title";
 
-  chrome.storage.local.get(["appliedJobs"], (result) => {
+  chrome.storage.local.get(["appliedJobs", "wishlistJobs"], (result) => {
     let appliedJobs = result.appliedJobs || {};
+    let wishlistJobs = result.wishlistJobs || {};
+    console.log("Applied Jobs:", appliedJobs);
+    console.log("Wishlist Jobs:", wishlistJobs);
     let statusDiv = document.getElementById("status");
-    let btn = document.getElementById("markBtn");
+    let markBtn = document.getElementById("markBtn");
+    let wishlistBtn = document.getElementById("wishlistBtn");
 
     // --- Current page check ---
     if (appliedJobs[url]) {
       statusDiv.innerHTML = `✅ Already applied here! <br>
               Applied on: ${appliedJobs[url].date}<br>
               (${getTimeBetween(appliedJobs[url].date)})`;
-      btn.style.display = "none";
+      markBtn.style.display = "none";
+      wishlistBtn.style.display = "none";
+    } else if (wishlistJobs[url]) {
+      statusDiv.innerHTML = `💖 In wishlist! <br>
+              Added on: ${wishlistJobs[url].date}<br>
+              (${getTimeBetween(wishlistJobs[url].date)})`;
+      markBtn.style.display = "block";
+      wishlistBtn.textContent = "Remove from Wishlist";
+      wishlistBtn.onclick = () => {
+        delete wishlistJobs[url];
+        chrome.storage.local.set({ wishlistJobs }, () => {
+          statusDiv.textContent = "❌ Not applied yet.";
+          wishlistBtn.textContent = "Add to Wishlist";
+          setupWishlistButton();
+        });
+      };
     } else {
       statusDiv.textContent = "❌ Not applied yet.";
-      btn.style.display = "block";
-      btn.onclick = () => {
-        appliedJobs[url] = {
+      markBtn.style.display = "block";
+      wishlistBtn.style.display = "block";
+      setupWishlistButton();
+    }
+
+    // --- Mark as applied button ---
+    markBtn.onclick = () => {
+      appliedJobs[url] = {
+        date: new Date().toLocaleString(),
+        title: pageTitle
+      };
+      
+      // Remove from wishlist if it exists
+      if (wishlistJobs[url]) {
+        delete wishlistJobs[url];
+      }
+      
+      chrome.storage.local.set({ appliedJobs, wishlistJobs }, () => {
+        statusDiv.textContent = "✅ Marked as applied!";
+        markBtn.style.display = "none";
+        wishlistBtn.style.display = "none";
+      });
+    };
+
+    function setupWishlistButton() {
+      wishlistBtn.onclick = () => {
+        wishlistJobs[url] = {
           date: new Date().toLocaleString(),
-          title: document.title
+          title: pageTitle
         };
-        chrome.storage.local.set({ appliedJobs }, () => {
-          statusDiv.textContent = "✅ Marked as applied!";
-          btn.style.display = "none";
+        chrome.storage.local.set({ wishlistJobs }, () => {
+          statusDiv.innerHTML = `💖 Added to wishlist!`;
+          wishlistBtn.textContent = "Remove from Wishlist";
+          wishlistBtn.onclick = () => {
+            delete wishlistJobs[url];
+            chrome.storage.local.set({ wishlistJobs }, () => {
+              statusDiv.textContent = "❌ Not applied yet.";
+              wishlistBtn.textContent = "Add to Wishlist";
+              setupWishlistButton();
+            });
+          };
         });
       };
     }
   });
 
-  // --- Open list page ---
+  // --- Open pages ---
   document.getElementById("showAllBtn").onclick = () => {
     chrome.runtime.openOptionsPage();
+  };
+
+  document.getElementById("showWishlistBtn").onclick = () => {
+    chrome.tabs.create({ url: chrome.runtime.getURL("wishlist.html") });
   };
 });
 

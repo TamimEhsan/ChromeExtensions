@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Wishlist Jobs</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; max-width: 800px; margin: 0 auto; }
+    .job-item { border: 1px solid #ddd; padding: 15px; margin: 10px 0; border-radius: 5px; }
+    .job-title { font-weight: bold; margin-bottom: 5px; }
+    .job-date { color: #666; font-size: 0.9em; }
+    .job-url { word-break: break-all; margin-top: 5px; }
+    .job-url a { color: #007bff; text-decoration: none; }
+    .job-url a:hover { text-decoration: underline; }
+    button { padding: 5px 10px; margin: 5px 0; }
+    .empty-state { text-align: center; color: #666; margin-top: 50px; }
+    .header { display: flex; justify-content: space-between; align-items: center; }
+    .actions { margin-top: 10px; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>💖 Wishlist Jobs</h1>
+    <div>
+      <button id="viewAppliedBtn">View Applied Jobs</button>
+      <button id="clearAllBtn">Clear All</button>
+    </div>
+  </div>
+  <div id="jobsList"></div>
+
+  <script src="wishlist.js"></script>
+</body>
+</html>
